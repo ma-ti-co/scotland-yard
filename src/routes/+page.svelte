@@ -1,7 +1,7 @@
 <script>
   import { invalidate } from '$app/navigation';
-import {onMount} from 'svelte'
-export let data;
+	import {onMount} from 'svelte'
+	export let data;
 let {supabase, session} = data;
 // when supabase or session changes => change data
 $: ({supabase, session} = data)
