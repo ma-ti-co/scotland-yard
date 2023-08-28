@@ -1,7 +1,22 @@
 <script>
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
+  import { invalidate } from '$app/navigation';
+import {onMount} from 'svelte'
+export let data;
+let {supabase, session} = data;
+// when supabase or session changes => change data
+$: ({supabase, session} = data)
+
+onMount(() => {
+	 const {
+		data: {subscription}
+	 } = supabase.auth.onAuthStateChange((event, _session) => {
+		if(_session?.expires_at !== session?.expires_at){
+			// whenever onAuthStateChange is called, invalidate supabase:auth
+			invalidate('supbase:auth')
+		}
+	 })
+	 return () => subscription.unsubscribe();
+})
 </script>
 
 <svelte:head>
@@ -9,51 +24,14 @@
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcome_fallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+<section class="flex">
+		<div class="rounded-md bg-white p-4 lg:min-w-[600px] aspect-square">
+			<div class="text-4xl">
+				Welcome
+			</div>
+			<pre>
+			</pre>
+		</div>
 </section>
 
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 0.6;
-	}
 
-	h1 {
-		width: 100%;
-	}
-
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
-
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
-	}
-</style>
