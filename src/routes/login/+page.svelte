@@ -10,7 +10,10 @@
 	let {session, supabase} = data;
 	$: ({session, supabase} = data)
 
-	let form;
+
+
+	/** @type {import('./$types').ActionData} */
+	export let form;
 	
 </script>
 
@@ -20,6 +23,7 @@
 </svelte:head>
 
 
+{JSON.stringify(form)}
 <Card.Root class="w-[400px] self-center">
   <Card.Header class="text-center">
     <Card.Title tag="h1">Log In</Card.Title>
@@ -29,9 +33,19 @@
 			<div class="mb-4">
 				<Label for="name">Email</Label>
 				<Input name="email" type="text" />
+				{#if form && !form["email"]}
+				<div class="text-xs text-red-600 mt-2">
+					Please enter an email
+				</div>
+				{/if}
 			</div>
 			<Label for="name">Password</Label>
-			<Input name="password" type="password"/> 
+			<Input name="password" type="password"/>
+			{#if form && !form["password"]}
+				<div class="text-xs text-red-600 mt-2">
+					Please enter a password
+				</div>
+				{/if} 
 			<div class="mt-4">
 				<Button>Log In</Button>
 			</div>
