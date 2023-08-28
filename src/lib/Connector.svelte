@@ -16,8 +16,8 @@
 
 
   onMount(() => {
-  //let url = 'wss://hard-cod-29.deno.dev';
-  let url = 'ws://localhost:8080';
+  let url = 'wss://hard-cod-29.deno.dev';
+  //let url = 'ws://localhost:8080';
   ws = new WebSocket(url);
   ws.addEventListener('open', () => {
       ws.send(JSON.stringify({
