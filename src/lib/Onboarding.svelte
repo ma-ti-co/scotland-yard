@@ -1,7 +1,6 @@
 <script>
   import { fade } from 'svelte/transition';
   import {choosePlayerRoles, restPlayerRoles, createGameStartConstellation} from '$lib/gameplay'
-  import {PUBLIC_WS_PATH} from '$env/static/public'
   import { onMount, onDestroy } from "svelte";
   import User from '$lib/components/User.svelte'
   import OnlineOffline from './components/OnlineOffline.svelte';
@@ -17,23 +16,25 @@
   
 
   onMount(() => {
-  ws = new WebSocket(`${PUBLIC_WS_PATH}?id=${user_id}&game=${gameData.id}`);
+    let url = 'wss://hard-cod-29.deno.dev';
+  //let url = 'ws://localhost:8080';
+  ws = new WebSocket(url);
   ws.addEventListener('open', () => {
       ws
       ws.send(JSON.stringify({
-        event: "send-message",
-        message: "yo",
+        event: "open",
+        message: JSON.stringify({user:user_id, game:game_id}),
       }))
     })
     ws.addEventListener('message', (event) => {
       const data = JSON.parse(event.data);
-      if(data.event === 'update-users'){
+      if(data.event === 'update_users'){
+        // i am not getting here !
         active_users = data.user_ids;
       }
       
     })
     ws.addEventListener('close', (event) => {
-      console.log(event);
     })
 })
 
