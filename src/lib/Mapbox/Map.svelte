@@ -7,8 +7,8 @@ use:action={
 {
   accessToken:PUBLIC_MAPBOX_TOKEN,
   version: 'v2.12.0',
-  center: [ 12.2, 51.2 ],
-  zoom: 9,
+  center: [ 13.404954, 52.520008 ],
+  zoom: 3,
   style: 'mapbox://styles/mapbox/dark-v11'
 }}
 on:recentre
@@ -57,7 +57,11 @@ on:keydown
     // others. See mapboxContext.js
     mapInstance.set(map);
     mapboxInstance.set(mapbox);
-    queue.start(map)
+    queue.start(map);
+    map.flyTo({
+      zoom:9,
+      center: [ 13.404954, 52.520008 ]
+    })
     dispatch('ready')
   }
   

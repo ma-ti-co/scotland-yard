@@ -32,22 +32,27 @@ export const actions = {
         if(error){
           console.log(error)
         }else{
-          let response = await addUsersToGame(invitations, game[0].id)
-          console.log(response);
-          throw redirect(303, '/profile')
-          return response.filter(e => e !== undefined)
+          let response = await _addUsersToGame(invitations, game[0].id, session.user.id)
         }
     }catch(error){
       console.log(error)
+    }finally{
+      throw redirect(303, '/profile');
     }
   }
 }
 
 
 
-async function addUsersToGame (invitations, game_id) {
+export async function _addUsersToGame (invitations, game_id, user_id) {
   const promises = [];
-
+  const {data, error} = await supabase
+    .from('user_games')
+    .insert([{
+     user_id:user_id, 
+     game_id:game_id,
+      status:1
+  }])
   invitations.forEach((email) => {
     promises.push(
       (async () => {
@@ -75,7 +80,7 @@ async function addUsersToGame (invitations, game_id) {
   })
 
     // Wait for all promises to resolve
-    const results = await Promise.all(promises);
-    return results;
+  const results = await Promise.all(promises);
+
 
 }

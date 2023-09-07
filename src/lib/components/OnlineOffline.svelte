@@ -3,9 +3,17 @@ export let group
 export let id
 </script>
 
-{#if group.includes(id)}
-  <span class="text-xs p-1 rounded-sm bg-green-400">Online</span>
+<div class="absolute top-[-5px] right-[-5px]">
+<span class="relative flex h-3 w-3">
+{#if !group.includes(id)}
+  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
   {:else}
-  <span class="text-xs p-1 rounded-sm bg-red-400">Offline</span>
+  <span class="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+  <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
 {/if}
+</span>
+</div>
+
+
 

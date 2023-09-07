@@ -24,13 +24,14 @@ onMount(() => {
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
-<section class="flex">
-		<div class="rounded-md bg-white p-4 lg:min-w-[600px] aspect-square">
-			<div class="text-4xl">
-				Welcome
-			</div>
-			<pre>
-			</pre>
+<section class="flex justify-center">
+		<div class="rounded-md-4 w-full lg:min-w-[600px] aspect-square p-4">
+				<div class="text-xl font-bold">
+					Welcome to Scotland Yard.
+				</div>
+				<div>
+					A game is for 2 to 4 people. 
+				</div>
 		</div>
 </section>
 

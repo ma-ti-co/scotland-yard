@@ -1,7 +1,7 @@
 <script>
   import { onMount, getContext, afterUpdate, createEventDispatcher } from 'svelte'
   import { contextKey } from './mapbox.js';
-  import getRoutesForLine from '../../utils/getLine.js'
+  import {getRoutesForLine, resetMapRoute} from '$lib/gameplay.js'
   import {supabase} from '../../utils/supabaseClient'
   import Map from './Map.svelte';
   import { mapboxInstance } from './mapboxContext.js';
@@ -36,15 +36,9 @@
 
 
   async function getRouteData(){
-    const {data, error} = await supabase
-    .from('lines')
-    .select('*')
-    .eq('line', route.id)
-    if(error){
-      return error
-    }else{
-
+    const data = await getRoutesForLine(route);
     if(!data) return;
+
     // check if source was already fetched previously
     // if so, just append it to the layer again
     if(mapInstance.getSource(route.id)===undefined){
@@ -55,7 +49,7 @@
           'properties':{},
           'geometry': {
             'type': 'LineString',
-            'coordinates': data[0].data
+            'coordinates': data
           }
         }
       })
@@ -74,8 +68,7 @@
         }
       });
       mapInstance.flyTo({
-        zoom:14
+        zoom:12
       })
     }
-  }
 </script>

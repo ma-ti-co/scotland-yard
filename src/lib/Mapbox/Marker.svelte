@@ -30,6 +30,7 @@
   export let type
   export let uid = null
   export let color
+  export let mister_x = false
 
   let marker
   let element
@@ -79,7 +80,7 @@
   export function showDetails(event){
     map.flyTo({ 
       center:[lng, lat],
-      zoom:14
+      //zoom:14
     });
     // set higlight dot on current station
     // once the map has finished zooming
@@ -129,7 +130,14 @@
   {#if type==='location'}
   <slot></slot>
   {:else}
-  <div></div>
+  <span class="relative flex h-3 w-3">
+    <div></div>
+    {#if mister_x}
+    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-red-400 opacity-75"></span>
+    {:else}
+    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-sky-400 opacity-75"></span>
+    {/if}
+  </span>
   {/if}
 </div>
 

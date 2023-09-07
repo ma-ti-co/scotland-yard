@@ -1,4 +1,5 @@
-import { redirect } from '@sveltejs/kit';
+import { AuthApiError } from '@supabase/supabase-js';
+import { fail, redirect } from '@sveltejs/kit';
 
 // getting locals from main layout.ts
 // check for current session -> if true redirect to profile
@@ -18,16 +19,38 @@ export const actions = {
     const uname = data.get('uname')
     const email = data.get('email');
     const password = data.get('password');
+    let errors = [];
+    if(!uname){
+      errors.push('uname')
+    }
+    if(!email){
+      errors.push('email')
+    }
+    if(!password){
+      errors.push('password')
+    }
+    if(errors.length){
+      return fail(400, errors);
+    }
     if(email && password && uname){
-      const { data:user, error } = await supabase.auth.signInWithPassword({
-        uname: uname,
+      const { data:user, error } = await supabase.auth.signUp({
         email: email,
         password: password,
+        options: {
+          data: {
+            username:uname
+          }
+        }
       })
       if(error){
-        console.log(error);
+        if(error instanceof AuthApiError && error.status === 400){
+          return fail(400, {
+            error: 'Invalid Email or password.'
+          })
+        }
       }
-      console.log(user)
+      
+      throw redirect(303, "/profile")
     }
   }
 }

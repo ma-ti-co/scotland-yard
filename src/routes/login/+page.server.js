@@ -21,10 +21,10 @@ export const actions = {
     const password = data.get('password');
     let errors = [];
     if(!email){
-      errors.push({email:false})
+      errors.push('email')
     }
     if(!password){
-      errors.push({password:false})
+      errors.push('password')
     }
     if(errors.length){
       return fail(400, errors);
@@ -35,8 +35,8 @@ export const actions = {
         password: password,
       })
       if(error){
-        return fail(400, {credentials:false})
-        //return JSON.stringify(error);
+        errors.push('validation_error')
+        return fail(400, errors);
       }
     }
   }

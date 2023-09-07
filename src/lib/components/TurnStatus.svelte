@@ -1,11 +1,23 @@
 <script>
 import { Terminal } from "lucide-svelte";
 import * as Alert from "$lib/components/ui/alert";
-export let turn
+import {game_data} from "../../store"
+import { onMount, afterUpdate } from "svelte";
 export let user_id
+
+let _data;
+
+game_data.subscribe((prev) => {
+  _data = prev;
+})
+
+
+
 </script>
 
-{#if turn === user_id}
+
+
+{#if _data.next_move === user_id}
 <Alert.Root class="bg-green-300">
   <Alert.Title><strong>Your turn!</strong></Alert.Title>
   <Alert.Description>
@@ -16,7 +28,7 @@ export let user_id
 <Alert.Root class="bg-red-300">
   <Alert.Title>{user_id}</Alert.Title>
   <Alert.Description>
-    Waiting for {turn}
+    Waiting for
   </Alert.Description>
 </Alert.Root>
 {/if}
