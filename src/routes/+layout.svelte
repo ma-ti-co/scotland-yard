@@ -42,7 +42,7 @@
 
 <div class="app">
 
-	<nav class="flex justify-end text-xs p-2 z-10">
+	<nav class="flex justify-end items-center text-sm p-2 z-10 h-[var(--nav)]">
 		{#if session}
 		<div>
 			<HoverCard.Root>
@@ -78,7 +78,7 @@
 		<a href="/login" class="text-black">Login</a>
 		{/if}
 	</nav>
-	<main class="flex flex-col justify-center">
+	<main class="flex flex-col justify-center h-full">
 		<slot />
 	</main>
 </div>
@@ -87,7 +87,9 @@
 	.app {
 		display: flex;
 		flex-direction: column;
-		height: calc(100vh-10px);
+		min-height: 100vh;
 	}
-
+	main{
+		height:calc(100vh - var(--nav));
+	}
 </style>
