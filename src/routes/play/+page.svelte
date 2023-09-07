@@ -14,6 +14,12 @@
   let lnglat_static;
 
   let options = [{value:1000, label:"1km"}, {value:2000, label:'2km'}, {value:3000, label:'3km'}, {value:4000, label:'4km'},{value:5000, label:'5km'}];
+  let locations = [
+    {value:[13.36018, 52.49098], label:"Schöneberg"}, 
+    {value:[13.29561, 52.52212], label:"Charlottenburg"}, 
+    {value:[13.41829, 52.49911], label:"Kreuzberg"},
+    {value:[13.45395, 52.51584], label:"Friedrichshain"},
+  ]
   let players = 1;
   let is_loading = true;
   let response_errors;
@@ -39,8 +45,8 @@
   })
 
 
-  const fetchStops = async () => {
-    const URL = `https://v6.bvg.transport.rest/locations/nearby?latitude=${lnglat_static[1]}&longitude=${lnglat_static[0]}&distance=15000&results=750&linesOfStops=true`;
+  const fetchStops = async (lnglat) => {
+    const URL = `https://v6.bvg.transport.rest/locations/nearby?latitude=${lnglat[1]}&longitude=${lnglat[0]}&distance=15000&results=750&linesOfStops=true`;
     try{
       const response = await fetch(URL);
       if(response.status === 200){
@@ -85,7 +91,7 @@
 
     };
 }}>
-  <input class="hidden" value={lnglat_static} name="lnglat" />
+  <!-- <input class="hidden" value={lnglat_static} name="lnglat" /> -->
   <Label class="font-bold mb-1">
     Choose an Area
   </Label>
@@ -94,13 +100,17 @@
       <div>Great! We've loaded the {stops.length} nearest stops for your game.</div>
 </Card.Root>
   {/if}
-  <select on:change={() => {
+  <select on:change={(e) => {
+    let lnglat = e.target.value.split(',');
     is_loading=true
-    fetchStops()}
+    fetchStops(lnglat)}
   } name="area" class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium pr-4 placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mb-4">
     <option selected disabled>Select a play area</option>
-    {#each options as o}
-    <option value={o.value}>{o.label}</option>
+    {#if lnglat_static}
+    <option value={lnglat_static}>My Current Location</option>
+    {/if}
+    {#each locations as l}
+    <option value={l.value}>{l.label}</option>
     {/each}
   </select>
   <div class="mt-9">

@@ -1,3 +1,3 @@
-<div class="w-full lg:w-6/12 px-2 m-auto">
+<div class="w-full px-2 m-auto">
   <slot />
 </div>

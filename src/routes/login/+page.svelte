@@ -4,6 +4,7 @@
 	import * as Card from "$lib/components/ui/card";
   import { Textarea } from "$lib/components/ui/textarea";
 	import { Input } from "$lib/components/ui/input";
+	import { Loader2 } from "lucide-svelte";
 	import { Label } from "$lib/components/ui/label";
 	import {Button} from "$lib/components/ui/button";
   import { beforeNavigate } from '$app/navigation';
@@ -13,6 +14,7 @@
 
 	export let form;
 
+	let is_loading = false;
 
 	
 </script>
@@ -35,7 +37,13 @@
 					Incorrect email or password. Try again
 				</div>
 		{/if} 
-		<form method="POST" action="" use:enhance>
+		<form method="POST" action="" use:enhance={({}) => {
+			is_loading = true;
+			return async ({ result, update }) => {
+				is_loading = false;
+				update();
+			}
+		}}>
 			<div class="mb-4">
 				<Label for="name">Email</Label>
 				<Input name="email" type="text" />
@@ -53,7 +61,14 @@
 				</div>
 			{/if} 
 			<div class="mt-4">
+				{#if is_loading}
+				<Button disabled>
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					Log In
+				</Button>
+				{:else}
 				<Button>Log In</Button>
+				{/if}
 			</div>
 		</form>
   </Card.Content>

@@ -111,11 +111,16 @@ export const actions = {
 
   uploadImage: async ({request, locals: {supabase, getSession}}) => {
     let session = await getSession();
-    console.log(session.user.id);
-    // let form = await request.formData();
-    // let img = form.get('image');
-    // let user_id = session.user.id
-    // let upload = await upload_profile_image(supabase, img, user_id)
-    // console.log(upload);
+    let form = await request.formData();
+    let img = form.get('image');
+    console.log(img);
+    if(!img){
+      return fail(400, { img, missing: true });
+
+    }
+    let user_id = session.user.id
+    let upload = await upload_profile_image(supabase, img, user_id)
+    console.log(upload);
+    return {img: upload.publicUrl}
   }
 };

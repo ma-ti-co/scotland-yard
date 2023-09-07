@@ -77,7 +77,7 @@ onDestroy(() => {
 <TurnStatus turn={next_move} user_id={user_id}/>
 <Card.Root>
   <Card.Content>
-    <div class="grid grid-cols-4 lg:grid-cols-1 gap-2">
+    <div class="grid grid-cols-1 gap-2">
       {#each order as id (id)}
       <div class="view-transition" style={`--index:${order.indexOf(id)}`} animate:flip={{
         duration: 400

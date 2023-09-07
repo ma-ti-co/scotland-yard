@@ -28,6 +28,7 @@ import {game_data} from "../../store"
       {user.username}
     </div>
   </div>
+  {#if _game_data.game_status > 1}
   <div class="w-full text-xs">
     <div class="text-xs mb-2 font-bold">Current Position:</div>
     {_game_data.current_position_by_station ? _game_data.current_position_by_station[user.id] : ''}
@@ -38,6 +39,7 @@ import {game_data} from "../../store"
     <Badge>{Object.keys(tickets)[0][0].toUpperCase()+Object.keys(tickets)[0].substring(1)}: {Object.values(tickets)[0]}</Badge>
     {/each}
   </div>
+  {/if}
   <OnlineOffline group={group} id={user.id} />
 </div>
 </div>

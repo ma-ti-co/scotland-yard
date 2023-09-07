@@ -38,7 +38,6 @@ export const upload_profile_image = async (supabaseClient,  img, user_id) => {
   if(error){
     return error
   }else{
-    console.log(data);
     const { data:image } = supabaseClient
     .storage
       .from('avatars')

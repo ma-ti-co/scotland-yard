@@ -7,7 +7,7 @@ let _user_id;
 
 
 let moves_by_product = {
-  bus:1,
+  bus:8,
   subway:3,
   tram:2
 }

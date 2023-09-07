@@ -77,25 +77,29 @@ const handleStepTwo = async () => {
   <div class="text-2xl max-w-7xl m-auto">
     <div>Please select who will play Mister X.</div>
   </div>
-  <div class="grid grid-cols-2 lg:grid-cols-3 gap-2 max-w-7xl m-auto mt-9">
+  <div class="grid lg:grid-cols-3 gap-2 max-w-7xl m-auto mt-9">
     {#each _game_data.profiles as player, index}
     {#if player.id !== _game_data.mister_x}
-    <button on:click={handlePlayerSelect(player.id)} transition:fade={{ duration: 2000 }}>
-      <User group={active_users} user={player} />
-    </button>
+      {#if gameData.game_owner === user_id}
+        <button on:click={handlePlayerSelect(player.id)} transition:fade={{ duration: 2000 }}>
+          <User group={active_users} user={player} />
+        </button>
+        {:else}
+          <User group={active_users} user={player} />
+      {/if}
     {/if}
     {/each}
   </div>
   {:else}
-  <div class="flex flex-wrap gap-2 justify-between">
+  <div class="grid gap-2 max-w-7xl m-auto lg:grid-cols-3">
     {#each _game_data.profiles as player, index}
     {#if player.id === _game_data.mister_x}
-    <div class="flex-1">
+    <div class="mb-9">
       <div class="text-xl">Mr. X</div>
       <User group={active_users} user={player} />
-      <div class="mt-2">
+      <div class="mt-2 text-xs">
         <span class="font-bold">Rules for Mr.X</span>
-        <ul>
+        <ul class="list-disc pl-3">
           <li>Moves first</li>
           <li>Is only visible to the other players after every 2nd move.</li>
         </ul>
@@ -110,8 +114,10 @@ const handleStepTwo = async () => {
     {/each}
   </div>
   <div class="basis-full mt-6">
+    {#if gameData.game_owner === user_id}
     <Button on:click={restPlayerRoles(gameData)}>Reset Selection</Button>
     <Button on:click={handleStepTwo}>Next Step <ChevronRight /></Button>
+    {/if}
   </div>
   {/if}
 </div>

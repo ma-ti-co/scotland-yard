@@ -57,12 +57,6 @@
 					<div class="flex justify-between space-x-4">
 						<div class="space-y-1">
 							<h4 class="text-sm font-semibold">{profile.data?.username}</h4>
-							<div class="text-sm">
-								<form method="POST" action="/profile?/uploadImgae" use:enhance>
-									<input type="file" class="flex mb-2 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-									<Button variant="outline">Upload</Button>
-								</form>
-							</div>
 							<div class="flex items-center pt-2">
 								<span class="text-xs text-muted-foreground">
 									{profile.data.id}
