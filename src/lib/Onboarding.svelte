@@ -96,9 +96,17 @@ onDestroy(() => {
   }
 })
 
+const animationDirection = {
+  "forward":{ delay: 0, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut },
+  "backward":{ delay: 300, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut }
+}
 
 const handlePlayerSelect = (id) => {
   choosePlayerRoles(gameData, id)
+}
+
+const handlePlayerReset = () => {
+  resetPlayerRoles(gameData)
 }
 
 const handleGameLength = async (id) => {
@@ -139,7 +147,7 @@ async function handleStepTwo(){
     </div>
   </div>
   {#if steps === 0}
-  <section transition:fly={{ delay: 100, duration: 1000, x: 0, y: -100, opacity: 0.5, easing: quintOut }}>
+  <section transition:fly={{ delay: 0, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut }}>
     <div>
       <h2 class="text-xl mb-3">
         Who will play Mr. X?
@@ -165,8 +173,11 @@ async function handleStepTwo(){
     </div>
   </section>
   {:else if steps === 1}
-  <section transition:fly={{ delay: 100, duration: 1000, x: 0, y: -100, opacity: 0.5, easing: quintOut }}>
+  <section transition:fly={{ delay: 300, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut }}>
     <div>
+      <div class="mb-9">
+        <Button variant="ghost" on:click={()=>resetPlayerRoles(gameData)}><ChevronLeft class=""/> Go Back</Button>
+      </div>
       <h2 class="text-xl mb-3">
         How long should this game last?
       </h2>
@@ -189,7 +200,7 @@ async function handleStepTwo(){
     </div>
   </section>
   {:else if steps === 2}
-  <div class="flex items-center text-xl" transition:fly={{ delay: 100, duration: 1000, x: 0, y: -100, opacity: 0.5, easing: quintOut }}>
+  <div class="flex items-center text-xl" transition:fly={{ delay: 300, duration: 300, x: 0, y: 0, opacity: 0, easing: quintOut }}>
     <Loader2 class="mr-2 h-4 w-4 animate-spin" /> We are preparing your game now ...
   </div>
   {/if}

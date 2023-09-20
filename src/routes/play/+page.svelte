@@ -1,5 +1,6 @@
 <script>
   import { Loader2 } from "lucide-svelte";
+  import { UserPlus2 } from 'lucide-svelte';
   import { Check } from 'lucide-svelte';
   import {enhance} from '$app/forms'
 	import { fly, slide } from 'svelte/transition';
@@ -24,7 +25,7 @@
   let players = 1;
   let is_loading = true;
   let response_errors;
-  let stops;
+  let stops = null;
   let stops_filtered;
   let stops_are_loaded = false;
 
@@ -126,7 +127,7 @@
       {#each Array(players) as player, index}
       <Input class="mb-4" name={`player_${index}`} placeholder="Enter an Email Address" type="email" />
       {/each}
-      <button on:click|preventDefault={() => players++}>Add another Player</button>
+      <button class="flex text-xs items-center" on:click|preventDefault={() => players++}><UserPlus2 class="mr-2 items-center"/> Add another Player</button>
     </div>
     {#if response_errors}
     <Alert.Root variant="destructive">
@@ -137,7 +138,7 @@
     </Alert.Root>
     {/if}
     <div class="mt-9">
-      {#if is_loading}
+      {#if is_loading || !stops_are_loaded}
       <Button disabled>
         <Loader2 class="mr-2 h-4 w-4 animate-spin" />
       </Button>
@@ -148,7 +149,6 @@
   </form>
   </Card.Content>
   <Card.Footer>
-    Read the rules
   </Card.Footer>
   </Card.Root>
 </div>

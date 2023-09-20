@@ -53,7 +53,6 @@ export async function _addUsersToGame (invitations, game_id, user_id) {
      game_id:game_id,
       status:1
   }])
-  console.log(invitations);
   invitations.forEach((email) => {
     promises.push(
       (async () => {

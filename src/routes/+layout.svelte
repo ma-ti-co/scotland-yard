@@ -12,6 +12,7 @@
   import { enhance } from "$app/forms";
 	export let data
 
+
 	let {supabase, profile, session} = data;
 	$: ({supabase, profile, session} = data)
 
@@ -48,7 +49,7 @@
 		
 		<div>
 			{#if session}
-			Hi <a href="/profile" class="text-black font-bold">{profile.data?.username}</a>
+			Hi <a href="/profile" class="text-black font-bold mr-6">{profile.data?.username}</a>
 			<Button on:click={logout}>Log Out</Button>
 			{:else}
 			<a href="/login" class="text-black">Login</a>

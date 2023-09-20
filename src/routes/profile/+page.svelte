@@ -7,12 +7,12 @@
   import * as Card from "$lib/components/ui/card";
   import * as Dialog from "$lib/components/ui/dialog";
   import { onMount } from "svelte";
-  import { stringify } from "postcss";
   import GamePreview from "$lib/components/GamePreview.svelte";
   import { enhance } from "$app/forms";
   import toast, { Toaster } from 'svelte-french-toast';
   import Avatar from "$lib/components/Avatar.svelte";
   import ProfileCard from '$lib/components/ProfileCard.svelte';
+  import { Plus } from 'lucide-svelte';
   export let data;
 
   let games = data.aggregateGameData;
@@ -38,7 +38,7 @@
 <div class="flex flex-col lg:flex-row gap-2">
   <div class="mb-4 bg-white rounded-md basis-96 flex-1 p-2 xl:p-9">
     {#if games.length}
-    <Button href="/play">Create new Game</Button>
+    <Button href="/play">Create new Game <Plus class="ml-2" /></Button>
     <div class="grid lg:grid-cols-2 gap-4 mt-2">
       {#each games as game}
         <div transition:fade={{ delay: 250, duration: 300 }}>
@@ -51,7 +51,7 @@
       <div>
         <div class="text-2xl text-gray-300 text-center">No active games at the moment. Create one!</div>
         <div class="text-center mt-4">
-          <Button href="/play">Create new Game</Button>
+          <Button href="/play">Create new Game <Plus class="ml-2"/></Button>
         </div>
       </div>
     </div>

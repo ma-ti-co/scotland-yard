@@ -61,7 +61,6 @@ import { misterXIsVisible } from "$lib/gameplay";
     <div>
       <Avatar id={user.id} />
     </div>
-    {user.id}
     <div class="font-bold ml-3">
       {user.username} {#if user.id===mister_x}<span class="text-[9px] bg-red-700 text-white p-2 rounded-lg italic">Mister X</span>{/if}
     </div>

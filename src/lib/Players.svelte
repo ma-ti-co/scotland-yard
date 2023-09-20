@@ -29,11 +29,9 @@
   $: {
     //console.log(order);
     let next = _game_data.next_move;
-    console.log(next);
     let next_pos = order.indexOf(next);
     order.splice(next_pos, 1);
     order.unshift(next);
-    console.log(order);
   }
 
   // afterUpdate(() => {
@@ -84,8 +82,6 @@ onDestroy(() => {
 </script>
 
 <TurnStatus turn={next_move} user_id={user_id}/>
-{JSON.stringify(_game_data.next_move)}<br>
-{JSON.stringify(order)}
 <div class="grid grid-cols-1 gap-2 p-2">
   {#each order as id (id)}
   <div class="view-transition" style={`--index:${order.indexOf(id)}`} animate:flip={{

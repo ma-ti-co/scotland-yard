@@ -3,7 +3,6 @@ export let group
 export let id
 </script>
 
-{group}
 <div class="absolute top-[-5px] right-[-5px]">
 <span class="relative flex h-3 w-3">
 {#if group.includes(id)}
