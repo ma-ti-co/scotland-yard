@@ -1,15 +1,19 @@
 import { supabase } from "../utils/supabaseClient";
-import { game_data, focus_state, user_id, visible_stops } from "../store";
+import { game_data, focus_state, user_id, visible_stops, move_is_allowed, current_line, current_stop } from "../store";
+
 
 
 let _game_data;
 let _user_id;
+let _current_line;
+let _current_stop;
 
 
 let moves_by_product = {
   bus:8,
   subway:3,
-  tram:2
+  tram:2,
+  suburban:4
 }
 
 game_data.subscribe((data) => {
@@ -17,6 +21,12 @@ game_data.subscribe((data) => {
 })
 user_id.subscribe((data) => {
   _user_id = data;
+})
+current_line.subscribe((data) => {
+  _current_line = data;
+})
+current_stop.subscribe((data) => {
+  _current_stop = data;
 })
 
 export async function checkIfAllPlayersConfirmed(game_id){
@@ -48,7 +58,7 @@ export async function choosePlayerRoles(gameData, id){
         return data
       }
 }
-export async function restPlayerRoles(gameData){
+export async function resetPlayerRoles(gameData){
   const {data, error} = await supabase
       .from('games')
       .update({mister_x: null})
@@ -59,6 +69,31 @@ export async function restPlayerRoles(gameData){
       }else{
         return data
       }
+}
+
+export async function selectGameLength(gameData, index){
+
+  const options = [
+    [{suburban:3}, {subway:3}, {tram:2}],
+    [{suburban:6}, {subway:6}, {tram:4}],
+    [{suburban:10}, {subway:10}, {tram:8}]
+  ]
+
+  const available_tickets = {};
+
+  for(let i = 0; i < gameData.profiles.length; i++){
+    available_tickets[`${gameData.profiles[i].id}`] = options[index];
+  }
+  const {data, error} = await supabase
+  .from('games')
+  .update({available_tickets: available_tickets})
+  .eq('id', gameData.id)
+  .select()
+  if(error){
+    return error
+  }else{
+    return data
+  }
 }
 
 // create first random station for all players and set first move
@@ -75,7 +110,6 @@ export async function createGameStartConstellation(gameData){
     let random = getRandomInteger(gameData.allowed_stops.length);
     current_stations[`${gameData.profiles[i].id}`] = gameData.allowed_stops[random].name
     current_latlng[`${gameData.profiles[i].id}`] = [gameData.allowed_stops[random].location.longitude, gameData.allowed_stops[random].location.latitude]
-    available_tickets[`${gameData.profiles[i].id}`] = [{bus:5}, {subway:3}, {tram:3}];
   }
 
   const {data, error} = await supabase
@@ -87,7 +121,6 @@ export async function createGameStartConstellation(gameData){
           game_status: 2,
           next_move:players_sorted[0],
           moves_in_order:players_sorted,
-          available_tickets:available_tickets
         })
       .eq('id', gameData.id)
       .select()
@@ -122,6 +155,7 @@ export async function checkInUser(data){
   const {data: newData, error} = await supabase
     .from('games')
     .update({
+      game_status:user_and_x_overlap(data_to_update.name, user_id),
       current_position_in_latlng: current_latlng,
       current_position_by_station: current_stations, 
       next_move: new_move,
@@ -132,7 +166,6 @@ export async function checkInUser(data){
     .eq('id', game_id)
     .select()
     if(error){
-      console.log(error);
       return error
     }
 }
@@ -200,19 +233,20 @@ export async function getRoutesForLine (line) {
     if(error){
       return error
     }else{
-      console.log(checkIfMoveIsAllowed(data.data, line, line.product))
+      console.log(data.data);
+      checkIfMoveIsAllowed(data.data, line, line.product);
       return data.data
     }
 }
 
 
 export function checkIfMoveIsAllowed(data, line, current_product){
-  console.log(line);
   let allowed_moves = moves_by_product[current_product];
   // get current position of user
-  let user_position = getCurrentPositionByUserId(_user_id);
+  let user_position = latlng_by_user_id(_user_id);
   let position_on_line = data.indexOf(user_position);
 
+  let current_stop_in_latlng_stringified = JSON.stringify([_current_stop.location.longitude,_current_stop.location.latitude]);
 
 
   // Initialize a variable to store the matching array
@@ -221,21 +255,23 @@ export function checkIfMoveIsAllowed(data, line, current_product){
   // stringify the latlng array so that
   // we are able to get the users current
   // position on the line as an index
-  let latlng_stringified = [];
+  let _latlng_stringified = [];
   // Iterate through the array of arrays
   for (const i of data){
-    latlng_stringified.push(JSON.stringify(i));
+    _latlng_stringified.push(JSON.stringify(i));
   }
 
-  let position_on_line_as_index = latlng_stringified.indexOf(JSON.stringify(user_position))
 
-  
+  let position_on_line_as_index = _latlng_stringified.indexOf(JSON.stringify(user_position))
+
+  console.log(position_on_line_as_index);
   if(position_on_line_as_index === -1){
-    alert(`Stop is currently not reachable from your position`)
+    move_is_allowed.set(false);
   }else{
+
     // create a subset of all the stops that
-    // are reachable with the chosen transport
-    // e.g. bus => 3 steps forward and 3 steps back
+    // are reachable with the chosen transport mode
+    // e.g. bus => x steps forward and x steps back
     // if start index is negative (i.e. stop is one of first three stops on line)
     // start with 0 as start_index
     let index_start = position_on_line_as_index - allowed_moves < 0 ? 0 : position_on_line_as_index - allowed_moves;
@@ -261,9 +297,18 @@ export function checkIfMoveIsAllowed(data, line, current_product){
       }
     }
 
-    // filteredArray now contains the objects with matching latitude and longitude values
-    visible_stops.set(filteredArray);
+    let _current_stop_is_in_realm = filteredArray.some((node) => node.name === _current_stop.name);
+    if(!_current_stop_is_in_realm){
+      move_is_allowed.set(false);
+    }else{
+      move_is_allowed.set(true);
+      // filteredArray now contains the objects with matching latitude and longitude values
+      visible_stops.set(filteredArray);
+    }
+
+
   }
+
 
   
 }
@@ -284,7 +329,9 @@ async function updateGameField(game_id, field_key, value){
 }
 
 export function resetMapRoute(mapInstance){
-  mapInstance.removeLayer('route');
+  if(mapInstance.getLayer('route')){
+    mapInstance.removeLayer('route');
+  }
 }
 
 
@@ -304,6 +351,44 @@ function sortPlayers(arr, firstMove) {
   }
 }
 
-function getCurrentPositionByUserId(id){
+
+// only pass the value that is about to be stored
+// to the db and check it right away. 
+export function user_and_x_overlap(new_location, user_id){
+  // this will update the game status to 3 finishing the game
+  let mr_x = _game_data.mister_x;
+  if(user_id === mr_x) return 2;
+  if(_game_data.current_position_by_station && new_location === _game_data.current_position_by_station[mr_x]) return 3
+}
+
+export function users_are_out_of_tickets() {
+  let mr_x = _game_data.mister_x;
+  let users_minus_mr_x = _game_data.moves_in_order.filter(u => u !== mr_x);
+  // just increment for all users. if > 0, there are still tickets
+  const ticket_count_total = users_minus_mr_x.reduce((total, u) => {
+    _game_data.available_tickets[u].forEach((m) => {
+      total += Object.values(m)[0];
+    });
+    return total;
+  }, 0);
+}
+
+
+function users_minus_mr_x(game_data){
+  return _game_data.moves_in_order.filter(u => u !== _game_data.mister_x);
+}
+
+export function latlng_by_user_id(id){
   return _game_data.current_position_in_latlng[`${id}`];
 }
+
+export function station_by_user_id(id){
+  return _game_data.current_position_by_station[`${id}`];
+}
+
+export function user_is_at_this_station(user_id, station_name){
+  return station_by_user_id(user_id) === station_name
+}
+
+
+

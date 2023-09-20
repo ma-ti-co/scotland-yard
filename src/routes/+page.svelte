@@ -2,8 +2,10 @@
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
 	import { X } from 'lucide-svelte';
+	import BvgIcons from '$lib/BVGIcons.svelte'
   import { invalidate } from '$app/navigation';
   import Button from '$lib/components/ui/button/button.svelte';
+	import Rules from '$lib/components/Rules.svelte';
 	import {onMount} from 'svelte'
 	export let data;
 	let {supabase, session} = data;
@@ -31,43 +33,13 @@ onMount(() => {
 
 
 {#if show_rules}
-<div class="fixed md:top-1/2 left-1/2 bg-white bg-opacity-60 z-10 p-4 -translate-x-1/2 -translate-y-1/2 w-full lg:max-w-[650px] overflow-y-scroll aspect-square">
+<div class="fixed top-1/2 left-1/2 bg-white bg-opacity-60 z-10 p-4 -translate-x-1/2 -translate-y-1/2 w-full lg:max-w-[650px] overflow-y-scroll lg:aspect-square">
 	<div class="flex justify-end mb-9">
 		<Button variant="ghost" on:click={() => show_rules = false}>
 			<X />
 		</Button>
 	</div>
-	<div class="mb-9">
-			<p>
-			Welcome to the exhilarating world of Scotland Yard, a thrilling board game that will test your deductive skills and strategic thinking. 
-			In this game, you'll find yourself in the heart of London, tasked with tracking down the elusive Mr. X, a cunning criminal mastermind 
-			who has gone on a crime spree throughout the city. It's a battle of wits and strategy as you join forces with other detectives to bring 
-			Mr. X to justice or slip away into the shadows as the elusive fugitive.
-			</p>
-	</div>
-	<div class="mb-9">
-		<h2 class="text-xl mb-4 font-bold">Objective:</h2>
-			<ul>
-				<li>
-					For the detectives: Work together to capture Mr. X by landing on the same location as him on the game board.
-				</li>
-				<li>
-					For Mr. X: Avoid capture until you can escape the city or outlast the detectives until the end of the game.
-				</li>
-			</ul>
-	</div>
-	<div class="mb-9">
-		<h2 class="text-xl mb-4 font-bold">Game Setup:</h2>
-		<ul>
-			<li>
-				Each player starts from a randomly chosen point on the map. 
-			</li>
-			<li>
-				Each player has a number of tickets for each mode of transport.
-			</li>
-
-		</ul>
-	</div>
+	<Rules />
 </div>
 {/if}
 <section class="h-full lg:h-fit">
@@ -89,8 +61,13 @@ onMount(() => {
 			</div>
 		</div>
 	</div>
-	<div class="p-4">
+	<div class="p-4 flex">
+		<div>
 		<Button on:click={() => show_rules = true}>Read the Rules</Button>
+		</div>
+		<div class="ml-2" >
+			<Button href="/signup">Create an Account</Button>
+		</div>
 	</div>
 </div>
 </section>

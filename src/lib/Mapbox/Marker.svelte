@@ -1,6 +1,7 @@
 <script>
-  import { onMount, getContext, createEventDispatcher } from 'svelte'
+  import { onMount, getContext, createEventDispatcher, beforeUpdate } from 'svelte'
   import { contextKey } from './mapbox.js';
+  import { getRoutesForLine} from '$lib/gameplay.js'
   import { mapboxInstance, mapInstance } from '$lib/Mapbox/mapboxContext.js'; 
 
 
@@ -40,9 +41,7 @@
   $: marker && move(lng, lat)
 
 
-
   onMount(() => {
-
     const namedParams = Object.assign(
       {
         offset: markerOffset,
@@ -80,7 +79,7 @@
   export function showDetails(event){
     map.flyTo({ 
       center:[lng, lat],
-      //zoom:14
+      zoom:14
     });
     // set higlight dot on current station
     // once the map has finished zooming
@@ -133,9 +132,9 @@
   <span class="relative flex h-3 w-3">
     <div></div>
     {#if mister_x}
-    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-red-400 opacity-75"></span>
+    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-red-400 opacity-75 pointer-events-none"></span>
     {:else}
-    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-sky-400 opacity-75"></span>
+    <span class="animate-ping absolute top-0 left-0 inline-flex h-8 w-8 rounded-full bg-sky-400 opacity-75 pointer-events-none"></span>
     {/if}
   </span>
   {/if}

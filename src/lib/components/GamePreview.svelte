@@ -1,5 +1,7 @@
 <script>
-    import { Loader2 } from "lucide-svelte";
+  import { fade } from 'svelte/transition';
+  import { Loader2 } from "lucide-svelte";
+  import { X } from 'lucide-svelte';
   import {createEventDispatcher} from 'svelte';
   import { enhance } from "$app/forms";
   import { MoreVertical } from "lucide-svelte";
@@ -19,10 +21,10 @@
   export let user_id
 
   let error;
-  let dialog;
   let dialog_open = false;
   let is_loading = false;
-  let game_is_active = game.game_status
+  let game_is_active = game.game_status;
+  let game_is_deleted;
  
 
   const dispatch = createEventDispatcher();
@@ -40,7 +42,7 @@
   </Card.Header>
   <Card.Content>
     {#each game.data as player}
-    <div class="flex items-center justify-between pb-4">
+    <div class="flex items-center justify-between pb-4"  transition:fade={{ delay: 250, duration: 300 }}>
       <div class="flex items-center mr-6">
        <Avatar id={player.g_uid} />
         <div class="mx-6 mt-2">
@@ -67,7 +69,7 @@
                     return
                   }
                   update()
-                  toast.success('Player deleted.', {
+                  toast.error('Player deleted.', {
                     duration:3000
                   })
                 }
@@ -81,66 +83,76 @@
       {/if}
     </div>
     {/each}
-    {#if user_id === game.owner}
-    <Button name="email" variant="ghost" ><UserPlus2 class="mr-2"/> Add Player</Button>
-    {/if}
-<Dialog.Root bind:this={dialog} open={dialog_open}>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>Add a Player {dialog_open}</Dialog.Title>
-      <Dialog.Description>
-        Enter an Email and we will send out an invitation...
-      </Dialog.Description>
-    </Dialog.Header>
-    <form method="POST" action="?/addPlayer" use:enhance={({formElement, formData, action, cancel, submitter}) => {
-      return async ({ result, update }) => {
-        if(result.data && result.data.error){
-          error = result.data.error;
-          let t = setTimeout(() => {
-            error = null;
-          }, 3000)
-          return () => t.clearTimeout()
-        }else{
-          update()
-        }
-
-      };
-    }}>
-      <input class="hidden" name="game_id" value={game.id}/>
-      {#if error}
-      <div class="rounded-md bg-red-300 text-red-900 p-4">{error}</div>
+    {#if user_id === game.owner && game.game_status < 1}
+    <Button name="email" variant="ghost" on:click={() => {dialog_open = !dialog_open}}>
+      {#if !dialog_open}
+      <UserPlus2 class="mr-2"/>
+      Add Player
+      {:else}
+      <X class="mr-2"/>
       {/if}
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label class="text-right">Email</Label>
-          <Input name="email" class="col-span-3" />
+    </Button>
+    {/if}
+    {#if dialog_open}
+    <div>
+      <form method="POST" action="?/addPlayer" use:enhance={({formElement, formData, action, cancel, submitter}) => {
+        is_loading = true;
+        return async ({ result, update }) => {
+          if(result.data && result.data.error){
+            error = result.data.error;
+            let t = setTimeout(() => {
+              error = null;
+            }, 3000)
+            return () => t.clearTimeout()
+          }else{
+            is_loading = false;
+            const {id, username} = result.data.data;
+            let new_user = {g_uid:id, g_uname:username, g_status:0}
+            game.data = [...game.data, new_user];
+            toast.success('Player added');
+            dialog_open = !dialog_open;
+            update()
+          }
+
+        };
+      }}>
+        <input class="hidden" name="game_id" value={game.id}/>
+        {#if error}
+        <div class="rounded-md bg-red-300 text-red-900 p-4">{error}</div>
+        {/if}
+        <div class="flex itmes-center gap-2 mt-2">
+          <Input name="email" class="w-full" placeholder="Enter an Email Address"/>
+          {#if is_loading}
+          <Button disabled variant="success">
+            <Loader2 class="mr-2 h-4 w-4 animate-spin" /> Add
+          </Button>
+          {:else}
+          <Button type="submit">Add</Button>
+          {/if}
         </div>
-      </div>
-    <Dialog.Footer>
-      <Button type="submit">Add</Button>
-    </Dialog.Footer>
-  </form>
-  </Dialog.Content>
-</Dialog.Root>
+    </form>
+    </div>
+    {/if}
   </Card.Content>
   <Card.Footer>
-    <div class="flex justify-between w-full mt-14">
+    <div class="flex justify-between w-full xl:mt-14 flex-wrap">
       {#if game_is_active}
-          <Button data-sveltekit-preload-data="hover" href={`/play/${game.id}`}>Start Game</Button>
+          <Button data-sveltekit-preload-data="hover" href={`/play/${game.id}`}>{game.game_status > 1 ? 'Rejoin':'Start'} Game</Button>
       {:else}
-      <div class="flex items-center text-gray-600"><Loader2 class="mr-2 h-4 w-4 animate-spin" /> Waiting for all players to confirm.</div>
+      <div class="flex items-center flex-1 basis-full mb-4 xl:basis-1/2 xl:mb-0 text-gray-300"><Loader2 class="mr-2 h-4 w-4 animate-spin" /> Waiting for all players to confirm.</div>
       {/if}
       {#if user_id === game.owner}
       <div>
         <form action="?/deleteGame" method="POST" use:enhance={({}) => {
           is_loading = true;
           return async ({result, update}) => {
+            game_is_deleted = game.id;
             dispatch('delete', {
 			      id: game.id
 		        });
           }
         }}>
-          {#if is_loading}
+          {#if is_loading && game.id === game_is_deleted}
           <Button disabled variant="destructive">
             <Loader2 class="mr-2 h-4 w-4 animate-spin" />
           </Button>

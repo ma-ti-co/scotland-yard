@@ -42,14 +42,11 @@ export const actions = {
           }
         }
       })
-      if(error){
-        if(error instanceof AuthApiError && error.status === 400){
-          return fail(400, {
-            error: 'Invalid Email or password.'
-          })
-        }
+      if(error && error instanceof AuthApiError){
+        return fail(400, {
+          error: 'Invalid Email or password.'
+        })
       }
-      
       throw redirect(303, "/profile")
     }
   }

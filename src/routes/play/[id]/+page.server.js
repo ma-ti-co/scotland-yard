@@ -11,9 +11,9 @@ export const load = async ({params, locals: {supabase, getSession}}) => {
     throw redirect(302, '/login')
   } 
   const {id} = params
-  const gameData = await get_game_data_by_id(supabase, id)
-  if(gameData === null){
-    throw  redirect(300, '/profile');
+  const gameData = await get_game_data_by_id(supabase, id);
+  if(gameData === null || someDataMissing(gameData)){
+    throw  redirect(301, '/profile');
   }else{
     if(!accessAllowed(gameData.profiles, session.user.id)){
       throw  redirect(300, '/profile');
@@ -25,4 +25,10 @@ export const load = async ({params, locals: {supabase, getSession}}) => {
 // middleware function checks if user is allowed to access
 function accessAllowed(allowed_players, user_id){
   return allowed_players.some((node) => node.id === user_id);
+}
+
+
+function someDataMissing(gameData){
+  // if game is active, not gameData value should be null
+  return gameData.game_status === 2 && Object.values(gameData).some((data) => data === null);
 }

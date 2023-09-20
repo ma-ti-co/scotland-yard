@@ -1,14 +1,14 @@
 import {fail, json, redirect } from '@sveltejs/kit';
-import {delete_game_by_id, upload_profile_image} from '$lib/db.js'
+import {delete_game_by_id, upload_profile_image, replace_profile_image ,delete_profile_image} from '$lib/db.js'
 import {checkIfAllPlayersConfirmed} from '$lib/gameplay.js'
 
 // getting locals from main layout.ts
 // check for current session -> if true redirect to profile
 
 
-export const load = async ({request, locals:{supabase, getProfile, getSession}}) => {
+export const load = async ({request, locals:{supabase, profile, getSession}}) => {
   const session = await getSession();
-
+  
   if(!session){
     throw redirect(303, '/login');
   }
@@ -66,7 +66,9 @@ export const actions = {
       if(error && error.code==='23505'){
         return fail(400, {error:"User was already invited"})
       }
-      throw redirect(304, '/profile')
+      if(!error){
+        return {data:user}
+      }
     }
   },
 
@@ -109,18 +111,31 @@ export const actions = {
     return {user_id:uid, game_is_active:!game_is_active}
   },
 
+
+
   uploadImage: async ({request, locals: {supabase, getSession}}) => {
     let session = await getSession();
     let form = await request.formData();
     let img = form.get('image');
-    console.log(img);
     if(!img){
       return fail(400, { img, missing: true });
-
     }
     let user_id = session.user.id
-    let upload = await upload_profile_image(supabase, img, user_id)
+    let upload = await upload_profile_image(supabase, img, user_id);
     console.log(upload);
+    if(upload.statusCode === '409'){
+      let upload = await replace_profile_image(supabase, img, user_id);
+      console.log(upload);
+    }
     return {img: upload.publicUrl}
-  }
+  },
+
+
+  deleteImage: async ({request, locals: {supabase, getSession}}) => {
+    let session = await getSession();
+    let user_id = session.user.id;
+    console.log(user_id);
+    const data = await delete_profile_image(supabase, user_id);
+    console.log(data);
+  },
 };

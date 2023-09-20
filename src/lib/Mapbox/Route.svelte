@@ -4,7 +4,6 @@
   import {getRoutesForLine, resetMapRoute} from '$lib/gameplay.js'
   import {supabase} from '../../utils/supabaseClient'
   import Map from './Map.svelte';
-  import { mapboxInstance } from './mapboxContext.js';
 
 
   const dispatch = createEventDispatcher();
@@ -18,6 +17,8 @@
         break;
       case 'subway':
         return 'rgb(0, 51, 153)';
+      case 'suburban':
+        return 'rgb(67, 152, 68)';
       default:
         return 'orange';
     }

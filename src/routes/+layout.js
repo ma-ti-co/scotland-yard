@@ -32,6 +32,5 @@ export const load = async ({ fetch, data, depends }) => {
       .single()
   : null
 
-
   return { supabase, session, profile }
 }

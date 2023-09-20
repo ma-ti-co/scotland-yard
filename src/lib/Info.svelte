@@ -1,6 +1,10 @@
 <script>
 import {createEventDispatcher, onMount} from "svelte"
-import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line} from "../store"
+import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line, move_is_allowed} from "../store"
+import {
+  station_by_user_id,
+  user_is_at_this_station,
+} from "$lib/gameplay"
 import BvgIcons from "./BVGIcons.svelte";
 import { Loader2 } from "lucide-svelte";
 import Button from "./components/ui/button/button.svelte";
@@ -16,15 +20,16 @@ let dispatch = createEventDispatcher();
 let _game_data;
 let _user_id;
 let _current_line;
+let _move_is_allowed;
 let current_product;
 $: user_can_move = _game_data.next_move === _user_id;
 
 
 
-
 game_data.subscribe((data) => _game_data = data)
-user_id.subscribe((data) => _user_id = data)
-current_line.subscribe((data) => _current_line = data)
+  user_id.subscribe((data) => _user_id = data)
+  current_line.subscribe((data) => _current_line = data)
+  move_is_allowed.subscribe((data) => _move_is_allowed = data);
 
 
 function ticketIsAvailable(key) {
@@ -36,10 +41,8 @@ const handleUserCheckIn = (payload) => {
   dispatch('checkInUser', payload);
   // reset some local state
   focus_state.set(false);
-  selected_line = null;
+  _current_line = null;
 }
-
-
 
 </script>
 
@@ -52,13 +55,28 @@ const handleUserCheckIn = (payload) => {
     <h2 class="text-md font-bold">{details.name}</h2>
   </div>
   <div class="mt-2 lg:mt-9">
-    {#if user_can_move}
-    <Button class="bg-green-600 hover:bg-green-700" on:click={() => {
-      handleUserCheckIn({name: details.name, lnglat:[details.location.longitude, details.location.latitude], product:current_product});
-    }
-    }>
+    {#if user_can_move && !user_is_at_this_station(_user_id, details.name)}
+      {#if !_current_line}
+      <div class="text-xs">
+        Please select a line you want to use first
+      </div>
+      {:else if !_move_is_allowed}
+      <div class="text-xs">
+        This move is not allowed at the moment. Please select a line that is on your current position
+      </div>
+      {:else}
+      <Button class="bg-green-600 hover:bg-green-700" on:click={() => {
+        handleUserCheckIn({name: details.name, lnglat:[details.location.longitude, details.location.latitude], product:current_product});
+      }
+      }>
       Check In
-    </Button>
+      </Button>
+      {/if}
+
+    {:else if user_is_at_this_station(_user_id, details.name)}
+    <div class="bg-green-300 text-green-700 p-3 rounded-md">
+      You are currently at this station
+    </div>
     {:else}
     <Button disabled>
       <Loader2 class="mr-2 h-4 w-4 animate-spin" />
@@ -68,12 +86,14 @@ const handleUserCheckIn = (payload) => {
   </div>
   <div class="mt-9 flex gap-2 overflow-scroll lg:overflow-auto lg:flex-wrap">
     {#each details.lines as line}
+    {#if line.product === 'subway' || line.product === 'suburban' || line.product === 'tram'}
       {#if _current_line !== null}
         {#if _current_line === line.id}
+        <!-- RESET CURRENT LINE STATE -->
         <Button 
           on:click={() => {
              map.flyTo({
-              zoom:14
+              zoom:12
             })
             map.removeLayer('route');
             visible_stops.set(_game_data.allowed_stops);
@@ -98,7 +118,7 @@ const handleUserCheckIn = (payload) => {
       {#if ticketIsAvailable(line.product)}
       <Button variant="outline" on:click={() => {
         map.flyTo({
-          zoom:16
+          zoom:14
         })
         current_line.set(line.id);
         current_route.set(line);
@@ -118,6 +138,7 @@ const handleUserCheckIn = (payload) => {
       </Button>
       {/if}
       {/if}
+    {/if}
     {/each}
   </div>
   {/if}

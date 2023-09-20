@@ -27,7 +27,7 @@
 
 
 
-<Card.Root class="w-[400px] self-center">
+<Card.Root class="w-[400px] self-center m-4">
   <Card.Header class="text-center">
     <Card.Title tag="h1">Log In</Card.Title>
   </Card.Header>

@@ -1,5 +1,5 @@
 <script>
-import { Terminal } from "lucide-svelte";
+import { Loader2, Terminal } from "lucide-svelte";
 import * as Alert from "$lib/components/ui/alert";
 import {game_data} from "../../store"
 import { onMount, afterUpdate } from "svelte";
@@ -24,17 +24,17 @@ game_data.subscribe((data) => {
 
 
 {#if _game_data.next_move === user_id}
-<Alert.Root class="bg-green-300">
-  <Alert.Title><strong>Your turn!</strong></Alert.Title>
-  <Alert.Description>
+<section class="bg-green-200 text-green-700 p-4">
+  <div><strong>Your turn!</strong></div>
+  <div>
     You can now choose your next turn. See below which tickets are still available.
-  </Alert.Description>
-</Alert.Root>
+  </div>
+</section>
 {:else}
-<Alert.Root class="bg-red-300">
-  <Alert.Title>Waiting for <span class="font-bold">{next_move}</span> to make a move</Alert.Title>
-  <Alert.Description>
+<section class="bg-red-200 text-red-700 p-4">
+  <div class="flex items-center"><Loader2 class="h-3 w-3 animate-spin mr-2" /> Waiting for <span class="mx-1 font-bold">{next_move}</span> to make a move</div>
+  <div class="text-xs text-red-700">
     In the meantime, look for a Späti and get a beer.
-  </Alert.Description>
-</Alert.Root>
+  </div>
+</section>
 {/if}

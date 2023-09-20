@@ -4,10 +4,13 @@
 	import * as Card from "$lib/components/ui/card";
   import { Textarea } from "$lib/components/ui/textarea";
 	import { Input } from "$lib/components/ui/input";
+	import { Loader2 } from "lucide-svelte";
 	import { Label } from "$lib/components/ui/label";
 	import {Button} from "$lib/components/ui/button";
   import { beforeNavigate } from '$app/navigation';
 	export let data;
+	let is_loading = false;
+	let error_msg;
 	let {session, supabase} = data;
 	$: ({session, supabase} = data)
 
@@ -23,19 +26,29 @@
 </svelte:head>
 
 
-{#if form}
+{#if error_msg}
 <div class="w-[400px] self-center rounded-md bg-red-300 text-red-700 p-4 mb-2">
-	{form.error}
+	{error_msg}
 </div>
 {/if}
 
 
-<Card.Root class="w-[400px] self-center">
+<Card.Root class="w-[400px] self-center m-4">
   <Card.Header class="text-center">
     <Card.Title tag="h1">Sign Up</Card.Title>
   </Card.Header>
   <Card.Content>
-		<form method="POST" action="" use:enhance>
+		<form method="POST" action="" use:enhance={({}) => {
+			is_loading = true;
+			return async ({ result, update }) => {
+				is_loading = false;
+				if(result.status === 400){
+					error_msg = result.data.error
+				}else{
+					update();
+				}
+			}
+		}}>
 			<div class="mb-4">
 				<Label for="uname">Username</Label>
 				<Input name="uname" type="text" />
@@ -62,7 +75,14 @@
 				</div>
 			{/if} 
 			<div class="mt-4">
+				{#if is_loading}
+				<Button disabled>
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					Sign Up
+				</Button>
+				{:else}
 				<Button>Sign Up</Button>
+				{/if}
 			</div>
 		</form>
   </Card.Content>
