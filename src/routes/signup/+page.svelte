@@ -51,7 +51,6 @@
 				}
 			}
 		}}>
-		{JSON.stringify(form)}
 			<div class="mb-4">
 				<Label for="uname">Username</Label>
 				<Input name="uname" type="text" />

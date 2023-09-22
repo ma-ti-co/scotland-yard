@@ -27,8 +27,8 @@ onMount(() => {
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>Kottbusser Damm - Home</title>
+	<meta name="description" content="Kottbusser Damm" />
 </svelte:head>
 
 

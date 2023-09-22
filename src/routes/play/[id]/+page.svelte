@@ -149,6 +149,10 @@ const handleClickOnMarker = (stop) => {
 
 </script>
 
+<svelte:head>
+	<title>Kottbusser Damm - Game #{gameData.id}</title>
+</svelte:head>
+
 
 {#if errors.length}
 <div class="w-full bg-red-300 text-red-800">

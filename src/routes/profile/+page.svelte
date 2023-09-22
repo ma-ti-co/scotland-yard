@@ -34,6 +34,9 @@
 
 </script>
 
+<svelte:head>
+	<title>Kottbusser Damm - Profile</title>
+</svelte:head>
 
 <div class="flex flex-col lg:flex-row gap-2">
   <div class="mb-4 bg-white rounded-md basis-96 flex-1 p-2 xl:p-9">

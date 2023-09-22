@@ -63,6 +63,10 @@
   }
 </script>
 
+<svelte:head>
+	<title>Kottbusser Damm - Create a Game</title>
+</svelte:head>
+
 <div class="m-2">
   {#if lnglat_static!== undefined && lnglat_static !== null}
   <Card.Root class="w-full lg:w-[400px] self-center mb-4 bg-green-200 pt-3 text-sm">
