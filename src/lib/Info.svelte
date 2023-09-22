@@ -1,6 +1,6 @@
 <script>
 import {createEventDispatcher, onMount} from "svelte"
-import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line, move_is_allowed} from "../store"
+import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line, move_is_allowed, move_error_message} from "../store"
 import {
   station_by_user_id,
   user_is_at_this_station,
@@ -21,6 +21,7 @@ let _game_data;
 let _user_id;
 let _current_line;
 let _move_is_allowed;
+let _move_error_message;
 let current_product;
 $: user_can_move = _game_data.next_move === _user_id;
 
@@ -30,6 +31,7 @@ game_data.subscribe((data) => _game_data = data)
   user_id.subscribe((data) => _user_id = data)
   current_line.subscribe((data) => _current_line = data)
   move_is_allowed.subscribe((data) => _move_is_allowed = data);
+  move_error_message.subscribe((data) => _move_error_message = data);
 
 
 function ticketIsAvailable(key) {
@@ -61,8 +63,8 @@ const handleUserCheckIn = (payload) => {
         Please select a line you want to use first
       </div>
       {:else if !_move_is_allowed}
-      <div class="text-xs">
-        This move is not allowed at the moment. Please select a line that is on your current position
+      <div class="text-xs bg-red-300 text-red-700 p-4 rounded-md">
+        {_move_error_message}
       </div>
       {:else}
       <Button class="bg-green-600 hover:bg-green-700" on:click={() => {

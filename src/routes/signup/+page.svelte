@@ -8,6 +8,7 @@
 	import { Label } from "$lib/components/ui/label";
 	import {Button} from "$lib/components/ui/button";
   import { beforeNavigate } from '$app/navigation';
+  import { tick } from 'svelte';
 	export let data;
 	let is_loading = false;
 	let error_msg;
@@ -43,12 +44,14 @@
 			return async ({ result, update }) => {
 				is_loading = false;
 				if(result.status === 400){
-					error_msg = result.data.error
+					error_msg = result.data.error;
+					update();
 				}else{
 					update();
 				}
 			}
 		}}>
+		{JSON.stringify(form)}
 			<div class="mb-4">
 				<Label for="uname">Username</Label>
 				<Input name="uname" type="text" />

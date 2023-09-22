@@ -35,6 +35,7 @@ export const actions = {
         password: password,
       })
       if(error){
+        console.log(error);
         errors.push('validation_error')
         return fail(400, errors);
       }

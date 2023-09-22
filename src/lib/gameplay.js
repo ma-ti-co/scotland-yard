@@ -1,5 +1,5 @@
 import { supabase } from "../utils/supabaseClient";
-import { game_data, focus_state, user_id, visible_stops, move_is_allowed, current_line, current_stop } from "../store";
+import { game_data, focus_state, user_id, visible_stops, move_is_allowed, current_line, current_stop, move_error_message, filtered_stops } from "../store";
 
 
 
@@ -10,9 +10,9 @@ let _current_stop;
 
 
 let moves_by_product = {
-  bus:8,
-  subway:3,
-  tram:2,
+  bus:800,
+  subway:5,
+  tram:4,
   suburban:4
 }
 
@@ -233,7 +233,6 @@ export async function getRoutesForLine (line) {
     if(error){
       return error
     }else{
-      console.log(data.data);
       checkIfMoveIsAllowed(data.data, line, line.product);
       return data.data
     }
@@ -241,11 +240,11 @@ export async function getRoutesForLine (line) {
 
 
 export function checkIfMoveIsAllowed(data, line, current_product){
+
   let allowed_moves = moves_by_product[current_product];
   // get current position of user
   let user_position = latlng_by_user_id(_user_id);
-  let position_on_line = data.indexOf(user_position);
-
+  
   let current_stop_in_latlng_stringified = JSON.stringify([_current_stop.location.longitude,_current_stop.location.latitude]);
 
 
@@ -263,9 +262,11 @@ export function checkIfMoveIsAllowed(data, line, current_product){
 
 
   let position_on_line_as_index = _latlng_stringified.indexOf(JSON.stringify(user_position))
-
-  console.log(position_on_line_as_index);
+  console.log('current_line', _current_line);
+  console.log('Check: Is user on the current line?')
+  console.log(position_on_line_as_index===-1 ? 'NO':'YES');
   if(position_on_line_as_index === -1){
+    move_error_message.set('Move is not allowed. None of the lines on your current stop pass through here.')
     move_is_allowed.set(false);
   }else{
 
@@ -295,10 +296,13 @@ export function checkIfMoveIsAllowed(data, line, current_product){
       if (matchingArray) {
         filteredArray.push(obj);
       }
+      filtered_stops.set(filteredArray)
     }
 
     let _current_stop_is_in_realm = filteredArray.some((node) => node.name === _current_stop.name);
+    console.log('in realm?', _current_stop_is_in_realm);
     if(!_current_stop_is_in_realm){
+      move_error_message.set('This stop is too far away from your current position. Please choose a nearer stop on the same line.')
       move_is_allowed.set(false);
     }else{
       move_is_allowed.set(true);

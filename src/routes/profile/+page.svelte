@@ -60,7 +60,7 @@
 
 
   <div class="order-1">
-    <ProfileCard session={session} profile={profile} />
+    <ProfileCard profile={profile} />
   </div>
 </div>
 

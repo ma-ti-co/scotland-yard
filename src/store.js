@@ -34,3 +34,7 @@ gameplay.js and read in Info.svelte
 */
 export const move_is_allowed = writable(null);
 
+export const filtered_stops = writable(null);
+
+export const move_error_message = writable(null);
+

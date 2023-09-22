@@ -1,4 +1,5 @@
 <script>
+  import { PUBLIC_SUPABASE_URL } from '$env/static/public'
   import { enhance } from "$app/forms";
   import * as Card from "$lib/components/ui/card";
   import Button from "./ui/button/button.svelte";
@@ -16,8 +17,8 @@
   let upload_error
 
   $: if (files !== undefined){
-    if(files[0].size > 100_000){
-      upload_error = 'Filesize is too large. Please choose a file below 1MB'
+    if(files[0].size > 500_000){
+      upload_error = 'Filesize is too large. Please choose a file below 5MB'
     }else{
       upload_error = false
     }
@@ -36,7 +37,7 @@
     <Card.Header class="flex justify-center">
       <div class="flex justify-center my-6">
         {#if profile.data.avatar_url}
-        <img class="bg-gray-400 rounded-full h-16 aspect-square" src={`https://udazzzqqskonsleaxpwz.supabase.co/storage/v1/object/public/avatars/${profile.data.id}`} alt="" />
+        <img class="bg-gray-400 rounded-full h-16 aspect-square" src={`${PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${profile.data.id}`} alt="" />
         {:else}
         
           <form method="POST" action="?/uploadImage" use:enhance={({}) => {

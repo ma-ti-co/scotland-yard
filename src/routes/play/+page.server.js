@@ -53,6 +53,7 @@ export async function _addUsersToGame (invitations, game_id, user_id) {
      game_id:game_id,
       status:1
   }])
+  console.log(data);
   invitations.forEach((email) => {
     promises.push(
       (async () => {
@@ -68,7 +69,8 @@ export async function _addUsersToGame (invitations, game_id, user_id) {
         .from('user_games')
         .insert([{
           user_id:user.id,
-          game_id:game_id
+          game_id:game_id,
+          status:0
         }])
         .select()
         if(error){

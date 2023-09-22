@@ -46,6 +46,7 @@ export const upload_profile_image = async (supabaseClient,  img, user_id) => {
     .from('profiles')
     .update({avatar_url:imagePath})
     .eq('id', user_id);
+    console.log(imagePath);
     return imagePath;
   }
 }

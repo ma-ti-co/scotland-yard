@@ -32,6 +32,7 @@ export const actions = {
     if(errors.length){
       return fail(400, errors);
     }
+    // form complete
     if(email && password && uname){
       const { data:user, error } = await supabase.auth.signUp({
         email: email,
@@ -42,6 +43,7 @@ export const actions = {
           }
         }
       })
+      // check duplicates
       if(error && error instanceof AuthApiError){
         return fail(400, {
           error: 'Invalid Email or password.'

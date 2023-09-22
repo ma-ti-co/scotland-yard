@@ -96,10 +96,6 @@ onDestroy(() => {
   }
 })
 
-const animationDirection = {
-  "forward":{ delay: 0, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut },
-  "backward":{ delay: 300, duration: 300, x: 0, y: 100, opacity: 0, easing: quintOut }
-}
 
 const handlePlayerSelect = (id) => {
   choosePlayerRoles(gameData, id)

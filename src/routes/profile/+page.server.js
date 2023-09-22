@@ -17,9 +17,11 @@ export const load = async ({request, locals:{supabase, profile, getSession}}) =>
     .from('user_games')
     .select('game_id, games(*)')
     .eq('user_id', session.user.id);
+    //console.log(games);
     if(games){
       await Promise.all(games.map(async (game) => {
         const { data, error } = await supabase.rpc('all_games', { gid: game.game_id });
+        console.log(error);
         aggregateGameData.push({ id:game.game_id, game_status:game.games.game_status ,owner:game.games.game_owner, data:data });
       }));
     }
