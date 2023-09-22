@@ -83,7 +83,6 @@
   }
 
   export function showDetails(event){
-    console.log([lng, lat]);
     map.flyTo({ 
       center:[lng, lat],
       zoom:14
