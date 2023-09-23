@@ -20,7 +20,7 @@
   import * as Alert from "$lib/components/ui/alert";
   import Onboarding from "$lib/Onboarding.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import {game_data, focus_state, visible_stops, current_route, current_line, current_stop} from "../../../store.js"
+  import {game_data, focus_state, visible_stops, current_route, current_line, current_stop, play_area_expanded, filtered_stops} from "../../../store.js"
   import { beforeNavigate } from "$app/navigation";
   import toast, { Toaster } from 'svelte-french-toast';
 
@@ -36,6 +36,7 @@
   let currentLineDetails = null;
   let _current_route;
   let _current_line;
+  let _filtered_stops;
   let errors = [];
   let mister_x_is_visible = gameData.mister_x_is_visible;
   // get contexts
@@ -59,15 +60,17 @@
     }
   }
 
+  let _play_area_expanded
   current_route.subscribe(((data) => _current_route = data))
   current_line.subscribe(((data) => _current_line = data))
+  filtered_stops.subscribe(((data) => _filtered_stops = data))
+  play_area_expanded.subscribe((data) => _play_area_expanded = data)
 
 
   let slider
   let subscription
   let focus_is_on_stop
   let _visible_stops
-  let play_area_expanded = false
   focus_state.subscribe((data) => {
     focus_is_on_stop = data;
   })
@@ -130,8 +133,8 @@
 onDestroy(async () => {
   mapInstance.set(null);
   mapboxInstance.set(null);
-  // current_route.set(null);
-  // current_line.set(null)
+  current_route.set(null);
+  current_line.set(null)
 })
 
 
@@ -178,7 +181,7 @@ const handleClickOnMarker = (stop) => {
           lng={stop.location.longitude}
           type="location"
           color="gray"
-          on:clickForDetails={() => {handleClickOnMarker(stop)}}
+          on:clickForDetails={() => {handleClickOnMarker(stop);play_area_expanded.set(!_play_area_expanded)}}
         />
         {/each}
         {#if _current_route}
@@ -204,7 +207,7 @@ const handleClickOnMarker = (stop) => {
     </div>
 
   <!-- PLAY -->
-    <div class={"z-2 slider-wrapper md:basis-2/5 fixed h-full left-0 transition-all w-full md:relative bg-white " + (play_area_expanded ? "top-[15vh] md:top-0":"top-[60vh] md:top-0")}>
+    <div class={"z-2 slider-wrapper md:basis-2/5 fixed h-full left-0 transition-all duration-1000 w-full md:relative bg-white " + (_play_area_expanded ? "top-[15vh] md:top-0":"top-[60vh] md:top-0")}>
       <div class="flex justify-between p-2">
         <Tabs.Root value={focus_is_on_stop.toString()} class="w-[400px]">
           <Tabs.List>
@@ -213,7 +216,7 @@ const handleClickOnMarker = (stop) => {
           </Tabs.List>
         </Tabs.Root>
         <div class="md:hidden">
-          <Button class={ play_area_expanded ? 'rotate-180':''} variant="ghost" on:click={() => play_area_expanded = !play_area_expanded}>
+          <Button class={ _play_area_expanded ? 'rotate-180':''} variant="ghost" on:click={() => play_area_expanded.set(!_play_area_expanded)}>
             <ChevronUp />
           </Button>
         </div>

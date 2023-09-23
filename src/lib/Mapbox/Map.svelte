@@ -59,7 +59,8 @@ on:keydown
     mapboxInstance.set(mapbox);
     queue.start(map);
     map.flyTo({
-      zoom:9,
+      zoom:11,
+      duration:6000,
       center: [ 13.404954, 52.520008 ]
     })
     dispatch('ready')

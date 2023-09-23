@@ -27,9 +27,9 @@
   
 
   afterUpdate(() => {
-    if(mapInstance.getLayer('route') !== undefined){
-      mapInstance.removeLayer('route')
-    }
+    // if(mapInstance.getLayer('route') !== undefined || mapInstance.getLayer('route') !== null){
+    //   mapInstance.removeLayer('route')
+    // }
 
     getRouteData();
   })

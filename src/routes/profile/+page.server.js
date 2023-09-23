@@ -21,7 +21,6 @@ export const load = async ({request, locals:{supabase, profile, getSession}}) =>
     if(games){
       await Promise.all(games.map(async (game) => {
         const { data, error } = await supabase.rpc('all_games', { gid: game.game_id });
-        console.log(error);
         aggregateGameData.push({ id:game.game_id, game_status:game.games.game_status ,owner:game.games.game_owner, data:data });
       }));
     }
@@ -63,8 +62,10 @@ export const actions = {
         .from('user_games')
         .insert({
           user_id:user.id,
-          game_id:game
+          game_id:game,
+          status:0
         })
+      console.log(error);
       if(error && error.code==='23505'){
         return fail(400, {error:"User was already invited"})
       }

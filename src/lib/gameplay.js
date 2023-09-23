@@ -333,9 +333,8 @@ async function updateGameField(game_id, field_key, value){
 }
 
 export function resetMapRoute(mapInstance){
-  if(mapInstance.getLayer('route')){
-    mapInstance.removeLayer('route');
-  }
+  if(mapInstance.getLayer('route')===undefined) return;
+  mapInstance.removeLayer('route');
 }
 
 

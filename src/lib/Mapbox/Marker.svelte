@@ -1,6 +1,6 @@
 <script>
   import { PUBLIC_SUPABASE_URL } from '$env/static/public'
-  import { onMount, getContext, createEventDispatcher, beforeUpdate } from 'svelte'
+  import { onMount, getContext, createEventDispatcher, beforeUpdate, afterUpdate } from 'svelte'
   import { contextKey } from './mapbox.js';
   import { getRoutesForLine} from '$lib/gameplay.js'
   import {current_line, filtered_stops} from '../../store.js'

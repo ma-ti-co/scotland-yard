@@ -1,6 +1,6 @@
 <script>
 import {createEventDispatcher, onMount} from "svelte"
-import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line, move_is_allowed, move_error_message} from "../store"
+import {MapInstance, game_data, user_id, focus_state, visible_stops, current_route, current_line, move_is_allowed, move_error_message, play_area_expanded} from "../store"
 import {
   station_by_user_id,
   user_is_at_this_station,
@@ -22,6 +22,7 @@ let _user_id;
 let _current_line;
 let _move_is_allowed;
 let _move_error_message;
+let _play_area_expanded;
 let current_product;
 $: user_can_move = _game_data.next_move === _user_id;
 
@@ -32,6 +33,7 @@ game_data.subscribe((data) => _game_data = data)
   current_line.subscribe((data) => _current_line = data)
   move_is_allowed.subscribe((data) => _move_is_allowed = data);
   move_error_message.subscribe((data) => _move_error_message = data);
+  play_area_expanded.subscribe((data) => _play_area_expanded = data)
 
 
 function ticketIsAvailable(key) {
@@ -40,6 +42,7 @@ function ticketIsAvailable(key) {
   }
 
 const handleUserCheckIn = (payload) => {
+  play_area_expanded.set(false)
   dispatch('checkInUser', payload);
   // reset some local state
   focus_state.set(false);
@@ -87,6 +90,7 @@ const handleUserCheckIn = (payload) => {
     {/if}
   </div>
   <div class="mt-9 flex gap-2 overflow-scroll lg:overflow-auto lg:flex-wrap">
+    {_current_line}
     {#each details.lines as line}
     {#if line.product === 'subway' || line.product === 'suburban' || line.product === 'tram'}
       {#if _current_line !== null}
@@ -94,10 +98,14 @@ const handleUserCheckIn = (payload) => {
         <!-- RESET CURRENT LINE STATE -->
         <Button 
           on:click={() => {
+            play_area_expanded.set(false);
              map.flyTo({
+              duration: 4000,
               zoom:12
             })
-            map.removeLayer('route');
+            if(_current_line !== null){
+              map.removeLayer('route');
+            }
             visible_stops.set(_game_data.allowed_stops);
             current_line.set(null)
             current_route.set(null)
@@ -119,12 +127,24 @@ const handleUserCheckIn = (payload) => {
       {:else}
       {#if ticketIsAvailable(line.product)}
       <Button variant="outline" on:click={() => {
+        play_area_expanded.set(false);
         map.flyTo({
+          duration:12000,
           zoom:14
         })
         current_line.set(line.id);
         current_route.set(line);
         current_product = line.product;
+        setTimeout(() => {
+          if(line.id !== _current_line){
+            // weird workaround. sometimes the status is not
+            // set correctly at first try. if so, a retry will
+            // do the trick;
+            console.log("something is wrong, retrying");
+            current_line.set(null);
+            current_line.set(line.id);
+          }
+        }, 500)
       }}>
         <div>
           <BvgIcons type={line.product} />

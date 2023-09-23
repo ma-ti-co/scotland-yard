@@ -160,7 +160,7 @@ async function handleStepTwo(){
               <User pin={false} group={active_users} user={player} />
             </button>
             {:else}
-            <div class="w-33 flex-auto opacity-60">
+            <div class="w-33 flex-auto opacity-60 pointer-events-none">
               <User pin={false} group={active_users} user={player} />
             </div>
           {/if}
